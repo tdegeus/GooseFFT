@@ -22,8 +22,8 @@ Since different approaches exists for this type of numerical method, and since t
 
 # Available examples
 
-1. `hyper-elasticity.py` and `hyper-elasticity_even-grid.py`: the main example of [1] featuring a simple hyper-elastic model in finite strain. As described in [1] the projection operator is slightly different for even or odd grids, here in included in two files. *Great to get started*.
+1. `finite-strain/hyper-elasticity.py` and `finite-strain/hyper-elasticity_even.py`: the main example of [1] featuring a simple hyper-elastic model in finite strain. As described in [1] the projection operator is slightly different for even or odd grids, here in included in two files. *Great to get started*.
 
-2. `elasto-plasticity_Simo.py` and `elasto-plasticity_Simo_even-grid.py`: an extension of example 1 with the Simo elasto-plastic model for finite strain. Furthermore, the definition of the projection operator is vectorized.
+2. `finite-strain/elasto-plasticity.py` and `finite-strain/elasto-plasticity_even.py`: an extension of example 1 with the Simo elasto-plastic model for finite strain. Furthermore, the definition of the projection operator is vectorized.
 
-3. `dual-phase-steel_2D-micrograph`: a realistic example to simulate the mechanical response of the 2-D micrograph of dual-phase steel. Compared to example 2 this example deals with assuming 2-D plane strain.
+3. `finite-strain/elasto-plasticity_2D-micrograph`: a realistic example to simulate the mechanical response of the 2-D micrograph of dual-phase steel. Compared to example 2 this example deals with assuming 2-D plane strain.

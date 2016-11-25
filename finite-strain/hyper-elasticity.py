@@ -32,8 +32,7 @@ P      = np.zeros([ndim,ndim,N,N,N])
 F      = np.array(I,copy=True)
 
 # projection operator                                         [grid of tensors]
-# NB can be vectorized (faster, less readable), see:
-#    "elasto-plasticity_Simo.py"
+# NB can be vectorized (faster, less readable), see: "elasto-plasticity.py"
 # - support function / look-up list / zero initialize
 delta  = lambda i,j: np.float(i==j)            # Dirac delta function
 freq   = np.arange(-(N-1)/2.,+(N+1)/2.)        # coordinate axis -> freq. axis

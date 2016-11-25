@@ -90,7 +90,7 @@ be_t   = np.array(I,copy=True)
 # ------------------------------------ FFT ------------------------------------
 
 # projection operator (only for non-zero frequency, associated with the mean)
-# NB: vectorized version of "hyper-elasticity_even-grid.py"
+# NB: vectorized version of "hyper-elasticity_even.py"
 # - allocate / support function
 Ghat4  = np.zeros([3,3,3,3,Nx,Ny,Nz])                # projection operator
 x      = np.zeros([3      ,Nx,Ny,Nz],dtype='int32')  # position vectors
