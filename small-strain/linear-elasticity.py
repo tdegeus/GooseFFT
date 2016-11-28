@@ -28,9 +28,6 @@ I4     = np.einsum('ijkl,xyz->ijklxyz',np.einsum('il,jk',i,i),np.ones([N,N,N]))
 I4rt   = np.einsum('ijkl,xyz->ijklxyz',np.einsum('ik,jl',i,i),np.ones([N,N,N]))
 I4s    = (I4+I4rt)/2.
 II     = dyad22(I,I)
-# stress and strain tensor                                     [grid of tensors]
-sig    = np.zeros([ndim,ndim,N,N,N])
-eps    = np.zeros([ndim,ndim,N,N,N])
 
 # projection operator                                         [grid of tensors]
 # NB can be vectorized (faster, less readable), see: "elasto-plasticity.py"
@@ -48,11 +45,11 @@ for i,j,l,m in itertools.product(range(ndim),repeat=4):
               delta(i,l)*q[j]*q[m]+delta(i,m)*q[j]*q[l])/(2.*q.dot(q))
 
 # (inverse) Fourier transform
-fft  = lambda x  : np.fft.fftshift(np.fft.fftn (np.fft.ifftshift(x),[N,N,N]))
-ifft = lambda x  : np.fft.fftshift(np.fft.ifftn(np.fft.ifftshift(x),[N,N,N]))
+fft  = lambda x: np.fft.fftshift(np.fft.fftn (np.fft.ifftshift(x),[N,N,N]))
+ifft = lambda x: np.fft.fftshift(np.fft.ifftn(np.fft.ifftshift(x),[N,N,N]))
 
 # projection 'G', and product 'G : K : eps'
-G        = lambda A2 : np.real( ifft( ddot42(Ghat4,fft(A2)) ) ).reshape(-1)
+G        = lambda A2   : np.real( ifft( ddot42(Ghat4,fft(A2)) ) ).reshape(-1)
 K_deps   = lambda depsm: ddot42(K4,depsm.reshape(ndim,ndim,N,N,N))
 G_K_deps = lambda depsm: G(K_deps(depsm))
 
@@ -69,15 +66,20 @@ K4     = K*II+2.*mu*(I4s-1./3.*II)
 
 # ----------------------------- NEWTON ITERATIONS -----------------------------
 
-# initialize / set macroscopic loading
+# initialize stress and strain tensor                         [grid of tensors]
+sig      = np.zeros([ndim,ndim,N,N,N])
+eps      = np.zeros([ndim,ndim,N,N,N])
+
+# set macroscopic loading
 DE       = np.zeros([ndim,ndim,N,N,N])
 DE[0,1] += 0.01
 DE[1,0] += 0.01
-En       = np.linalg.norm(DE)
 
 # initial residual: distribute "DE" over grid using "K4"
-b           = -G_K_deps(DE)
-eps        +=         DE
+b        = -G_K_deps(DE)
+eps     +=           DE
+En       = np.linalg.norm(eps)
+iiter    = 0
 
 # iterate as long as the iterative update does not vanish
 while True:
@@ -85,13 +87,9 @@ while True:
       A = sp.LinearOperator(shape=(ndof,ndof),matvec=G_K_deps,dtype='float'),
       b = b,
     )                                     # solve linear system using CG
-    eps += depsm.reshape(ndim,ndim,N,N,N) # update DOFs (array -> grid of tns.)
+    eps += depsm.reshape(ndim,ndim,N,N,N) # update DOFs (array -> tens.grid)
     sig  = ddot42(K4,eps)                 # new residual stress
     b     = -G(sig)                       # convert residual stress to residual
     print('%10.2e'%(np.max(depsm)/En))    # print residual to the screen
-    if np.max(depsm)/En<1.e-5: break      # check convergence
-
-print(eps[:,:, 0,0,0])
-print(eps[:,:,-1,0,0])
-print(sig[:,:, 0,0,0])
-print(sig[:,:,-1,0,0])
+    if np.linalg.norm(depsm)/En<1.e-5 and iiter>0: break # check convergence
+    iiter += 1

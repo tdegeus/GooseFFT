@@ -27,9 +27,6 @@ I4     = np.einsum('ijkl,xyz->ijklxyz',np.einsum('il,jk',i,i),np.ones([N,N,N]))
 I4rt   = np.einsum('ijkl,xyz->ijklxyz',np.einsum('ik,jl',i,i),np.ones([N,N,N]))
 I4s    = (I4+I4rt)/2.
 II     = dyad22(I,I)
-# stress and deformation gradient tensor                      [grid of tensors]
-P      = np.zeros([ndim,ndim,N,N,N])
-F      = np.array(I,copy=True)
 
 # projection operator                                         [grid of tensors]
 # NB can be vectorized (faster, less readable), see: "elasto-plasticity.py"
@@ -38,11 +35,11 @@ delta  = lambda i,j: np.float(i==j)            # Dirac delta function
 freq   = np.arange(-(N-1)/2.,+(N+1)/2.)        # coordinate axis -> freq. axis
 Ghat4  = np.zeros([ndim,ndim,ndim,ndim,N,N,N]) # zero initialize
 # - compute
-for i,j,k,l in itertools.product(range(ndim),repeat=4):
+for i,j,l,m in itertools.product(range(ndim),repeat=4):
     for x,y,z    in itertools.product(range(N),   repeat=3):
         q = np.array([freq[x], freq[y], freq[z]])  # frequency vector
         if not q.dot(q) == 0:                      # zero freq. -> mean
-            Ghat4[i,j,k,l,x,y,z] = delta(i,l)*q[j]*q[k]/(q.dot(q))
+            Ghat4[i,j,l,m,x,y,z] = delta(i,m)*q[j]*q[l]/(q.dot(q))
 
 # (inverse) Fourier transform
 fft    = lambda x  : np.fft.fftshift(np.fft.fftn (np.fft.ifftshift(x),[N,N,N]))
@@ -72,24 +69,28 @@ def constitutive(F):
 
 # ----------------------------- NEWTON ITERATIONS -----------------------------
 
-# initialize / set macroscopic loading
-DbarF       = np.zeros([ndim,ndim,N,N,N])
-DbarF[0,1] += 1.0
-Fn          = np.linalg.norm(F)
+# initialize deformation gradient, and stress/stiffness       [grid of tensors]
+F     = np.array(I,copy=True)
+P,K4  = constitutive(F)
+
+# set macroscopic loading
+DbarF = np.zeros([ndim,ndim,N,N,N]); DbarF[0,1] += 1.0
 
 # initial residual: distribute "barF" over grid using "K4"
-P,K4        = constitutive(F)
-b           = -G_K_dF(DbarF)
-F          +=         DbarF
+b     = -G_K_dF(DbarF)
+F    +=         DbarF
+Fn    = np.linalg.norm(F)
+iiter = 0
 
 # iterate as long as the iterative update does not vanish
 while True:
     dFm,_ = sp.cg(tol=1.e-8,
       A = sp.LinearOperator(shape=(F.size,F.size),matvec=G_K_dF,dtype='float'),
       b = b,
-    )                                    # solve linear system using CG
-    F    += dFm.reshape(ndim,ndim,N,N,N) # update DOFs (array -> grid of tens.)
-    P,K4  = constitutive(F)              # new residual stress and tangent
-    b     = -G(P)                        # convert residual stress to residual
-    print('%10.2e'%(np.max(dFm)/Fn))     # print residual to the screen
-    if np.max(dFm)/Fn<1.e-5: break       # check convergence
+    )                                        # solve linear system using CG
+    F    += dFm.reshape(ndim,ndim,N,N,N)     # update DOFs (array -> tens.grid)
+    P,K4  = constitutive(F)                  # new residual stress and tangent
+    b     = -G(P)                            # convert res.stress to residual
+    print('%10.2e'%(np.linalg.norm(dFm)/Fn)) # print residual to the screen
+    if np.linalg.norm(dFm)/Fn<1.e-5 and iiter>0: break # check convergence
+    iiter += 1

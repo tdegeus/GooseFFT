@@ -71,21 +71,14 @@ def inv2(A2):
 
 # ------------------------ INITIATE (IDENTITY) TENSORS ------------------------
 
-# identity tensor
-i      = np.eye(3)
-# identity tensors
-I      = np.einsum('ij,xyz'           ,                  i   ,np.ones([Nx,Ny,Nz]))
-I4     = np.einsum('ijkl,xyz->ijklxyz',np.einsum('il,jk',i,i),np.ones([Nx,Ny,Nz]))
-I4rt   = np.einsum('ijkl,xyz->ijklxyz',np.einsum('ik,jl',i,i),np.ones([Nx,Ny,Nz]))
-I4s    = (I4+I4rt)/2.
-II     = dyad22(I,I)
-# stress, deformation gradient, plastic strain, elastic Finger tensor
-# NB "_t" signifies that it concerns the value at the previous increment
-ep_t   = np.zeros([    Nx,Ny,Nz])
-P      = np.zeros([3,3,Nx,Ny,Nz])
-F      = np.array(I,copy=True)
-F_t    = np.array(I,copy=True)
-be_t   = np.array(I,copy=True)
+# identity tensor (single tensor)
+i    = np.eye(3)
+# identity tensors (grid)
+I    = np.einsum('ij,xyz'           ,                  i   ,np.ones([Nx,Ny,Nz]))
+I4   = np.einsum('ijkl,xyz->ijklxyz',np.einsum('il,jk',i,i),np.ones([Nx,Ny,Nz]))
+I4rt = np.einsum('ijkl,xyz->ijklxyz',np.einsum('ik,jl',i,i),np.ones([Nx,Ny,Nz]))
+I4s  = (I4+I4rt)/2.
+II   = dyad22(I,I)
 
 # ------------------------------------ FFT ------------------------------------
 
@@ -102,7 +95,7 @@ x[0],x[1],x[2] = np.mgrid[:Nx,:Ny,:Nz]
 for i in range(3):
     freq = np.arange(-shape[i]/2,+shape[i]/2)
     q[i] = freq[x[i]]
-# - length "Q = ||q||",
+# - compute "Q = ||q||",
 #   and "norm = 1/Q" being zero for Q==0 and Nyquist frequencies
 Q           = dot11(q,q)
 norm        = 1./Q
@@ -111,31 +104,21 @@ norm[0,:,:] = 0.
 norm[:,0,:] = 0.
 norm[:,:,0] = 0.
 # - set projection operator (grid)
-for i, j, k, l in itertools.product(range(3), repeat=4):
-    Ghat4[i,j,k,l] = norm*delta(i,l)*q[j]*q[k]
+for i, j, l, m in itertools.product(range(3), repeat=4):
+    Ghat4[i,j,l,m] = norm*delta(i,m)*q[j]*q[l]
 
 # (inverse) Fourier transform
-fft    = lambda x  : np.fft.fftshift(np.fft.fftn (np.fft.ifftshift(x),[Nx,Ny,Nz]))
-ifft   = lambda x  : np.fft.fftshift(np.fft.ifftn(np.fft.ifftshift(x),[Nx,Ny,Nz]))
+fft  = lambda x: np.fft.fftshift(np.fft.fftn (np.fft.ifftshift(x),[Nx,Ny,Nz]))
+ifft = lambda x: np.fft.fftshift(np.fft.ifftn(np.fft.ifftshift(x),[Nx,Ny,Nz]))
 
 # projection 'G', and product 'G : K^LT : (delta F)^T'
 G      = lambda A2 : np.real( ifft( ddot42(Ghat4,fft(A2)) ) ).reshape(-1)
 K_dF   = lambda dFm: trans2(ddot42(K4,trans2(dFm.reshape(3,3,Nx,Ny,Nz))))
 G_K_dF = lambda dFm: G(K_dF(dFm))
 
-# ---------------------------- MATERIAL PARAMETERS ----------------------------
-
-# phase indicator: square inclusion of volume fraction (3*3*14)/(10*12*14)
-phase  = np.zeros([Nx,Ny,Nz]); phase[:3,:3,:] = 1.
-# material parameters + function to convert to grid of scalars
-param  = lambda M0,M1: M0*np.ones([Nx,Ny,Nz])*(1.-phase)+M1*np.ones([Nx,Ny,Nz])*phase
-K      = param(0.833,0.833)  # bulk      modulus
-mu     = param(0.386,0.386)  # shear     modulus
-H      = param(0.004,0.008)  # hardening modulus
-tauy0  = param(0.003,0.006)  # initial yield stress
-
 # --------------------------- CONSTITUTIVE RESPONSE ---------------------------
 
+# return the constitutive response to a certain loading and history
 def constitutive(F,F_t,be_t,ep_t):
 
     # function to compute linearization of the logarithmic Finger tensor
@@ -148,7 +131,7 @@ def constitutive(F,F_t,be_t,ep_t):
             K4 += gc*dyad22(dyad11(vecs[:,m],vecs[:,n]),dyad11(vecs[:,m],vecs[:,n]))
         return K4
 
-    # elastic stiffness
+    # elastic stiffness tensor
     C4e      = K*II+2.*mu*(I4s-1./3.*II)
 
     # trial state
@@ -165,7 +148,7 @@ def constitutive(F,F_t,be_t,ep_t):
 
     # return map
     dgamma   = phi_s/(H+3.*mu)
-    ep       = ep_t+dgamma
+    ep       = ep_t  +   dgamma
     tau      = tau_s -2.*dgamma*N_s*mu
     lnbe     = lnbe_s-2.*dgamma*N_s
     be       = exp2(lnbe)
@@ -184,7 +167,26 @@ def constitutive(F,F_t,be_t,ep_t):
 
     return P,K4,be,ep
 
+# phase indicator: square inclusion of volume fraction (3*3*14)/(10*12*14)
+phase  = np.zeros([Nx,Ny,Nz]); phase[:3,:3,:] = 1.
+# function to convert materials parameters to grid of scalars
+param  = lambda M0,M1: M0*np.ones([Nx,Ny,Nz])*(1.-phase)+\
+                       M1*np.ones([Nx,Ny,Nz])*    phase
+# material parameters
+K      = param(0.833,0.833)  # bulk      modulus
+mu     = param(0.386,0.386)  # shear     modulus
+H      = param(0.004,0.008)  # hardening modulus
+tauy0  = param(0.003,0.006)  # initial yield stress
+
 # ---------------------------------- LOADING ----------------------------------
+
+# stress, deformation gradient, plastic strain, elastic Finger tensor
+# NB "_t" signifies that it concerns the value at the previous increment
+ep_t   = np.zeros([    Nx,Ny,Nz])
+P      = np.zeros([3,3,Nx,Ny,Nz])
+F      = np.array(I,copy=True)
+F_t    = np.array(I,copy=True)
+be_t   = np.array(I,copy=True)
 
 # initialize macroscopic incremental loading
 ninc   = 50
@@ -211,8 +213,12 @@ for inc in range(1,ninc):
     Fn = np.linalg.norm(F)
 
     # first iteration residual: distribute "barF" over grid using "K4"
-    b  = -G_K_dF(barF-barF_t)
-    F +=         barF-barF_t
+    b     = -G_K_dF(barF-barF_t)
+    F    +=         barF-barF_t
+    
+    # parameters for Newton iterations: normalization and iteration counter
+    Fn    = np.linalg.norm(F)
+    iiter = 0
 
     # iterate as long as the iterative update does not vanish
     while True:
@@ -230,7 +236,8 @@ for inc in range(1,ninc):
 
         # check for convergence, print convergence info to screen
         print('{0:10.2e}'.format(np.linalg.norm(dFm)/Fn))
-        if np.linalg.norm(dFm)/Fn<1.e-5: break
+        if np.linalg.norm(dFm)/Fn<1.e-5 and iiter>0: break
+        iiter += 1
 
     # end-of-increment: update history
     barF_t = np.array(barF,copy=True)
