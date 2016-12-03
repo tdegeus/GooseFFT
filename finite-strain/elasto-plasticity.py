@@ -211,7 +211,7 @@ for inc in range(1,ninc):
     # first iteration residual: distribute "barF" over grid using "K4"
     b     = -G_K_dF(barF-barF_t)
     F    +=         barF-barF_t
-    
+
     # parameters for Newton iterations: normalization and iteration counter
     Fn    = np.linalg.norm(F)
     iiter = 0
@@ -219,12 +219,14 @@ for inc in range(1,ninc):
     # iterate as long as the iterative update does not vanish
     while True:
 
-        # solve linear system; update DOFs
+        # solve linear system
         dFm,_ = sp.cg(tol=1.e-8,
           A   = sp.LinearOperator(shape=(F.size,F.size),matvec=G_K_dF,dtype='float'),
           b   = b,
         )
-        F    += dFm.reshape(3,3,Nx,Ny,Nz)
+
+        # add solution of linear system to DOFs
+        F += dFm.reshape(3,3,Nx,Ny,Nz)
 
         # compute residual stress and tangent, convert to residual
         P,K4,be,ep = constitutive(F,F_t,be_t,ep_t)

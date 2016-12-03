@@ -11,6 +11,7 @@ np.seterr(divide='ignore', invalid='ignore')
 # read phase indicator from micrograph: 0=soft, 1=hard
 phase  = np.load('odd_image.npz')['phase']
 
+# grid dimensions
 Nx     = phase.shape[0]  # number of pixels in x-direction
 Ny     = phase.shape[1]  # number of pixels in y-direction
 shape  = [Nx,Ny]         # number of voxels in all directions
@@ -208,7 +209,7 @@ for inc,lam in zip(range(1,ninc+1),stretch):
     # first iteration residual: distribute "barF" over grid using "K4"
     b     = -G_K_dF((barF-barF_t)[:2,:2])
     F    +=          barF-barF_t
-    
+
     # parameters for Newton iterations: normalization and iteration counter
     Fn    = np.linalg.norm(F)
     iiter = 0
