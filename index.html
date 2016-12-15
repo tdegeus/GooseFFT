@@ -13,14 +13,14 @@
     <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
 
-    <title>GooseFFT by Tom de Geus</title>
+    <title>Goosefft by tdegeus</title>
   </head>
 
   <body>
     <header>
       <div class="inner">
-        <h1>GooseFTT</h1>
-        <h2>Micro mechanical computations with the FFT-based method (see Geus et al., CMAME, 2016)</h2>
+        <h1>Goosefft</h1>
+        <h2>Micro mechanical computations with the FFT-based method</h2>
         <a href="https://github.com/tdegeus/GooseFFT" class="button"><small>View project on</small> GitHub</a>
       </div>
     </header>
@@ -28,20 +28,20 @@
     <div id="content-wrapper">
       <div class="inner clearfix">
         <section id="main-content">
-          
-
-<ul>
+          <ul>
 <li><a href="#introduction">Introduction</a></li>
-<li><a href="#available-examples">Available examples</a></li>
+<li><a href="#examples">Examples</a></li>
 <li><a href="#references">References</a></li>
 </ul>
 
-
+<blockquote>
+<p>This repository is distributed under an MIT license. In layman's term you are free to do what you want with it. We just kindly request you to cite our papers that form the basis for this repository, and encourage you to be equally open with your code.</p>
+</blockquote>
 
 <h1>
 <a id="introduction" class="anchor" href="#introduction" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Introduction</h1>
 
-<p>This repository is primarily meant for those researchers who want to dive into the FFT-based micro-mechanical solver. It contains several small, single-file, Python scripts which should lower the learning curve <a href="http://arxiv.org/abs/1603.08893">[1]</a>. These examples depend only on standard Python and its scientific libraries <a href="http://www.numpy.org">NumPy</a> and <a href="https://www.scipy.org">SciPy</a>. Note that Python/NumPy are widely used, and are freely available for all operating systems; no custom software or libraries, housing hidden layers of complexity, are used.</p>
+<p>This repository is primarily meant for those researchers who want to dive into the FFT-based micro-mechanical solver. It contains several small, single-file, Python scripts which should lower the learning curve (see Ref. <a href="http://arxiv.org/abs/1603.08893">[1]</a>, which was written with this particular aim). These examples are formulated both in small strain (with linear and non-linear elastic, elasto-plastic, elasto-visco-plastic constitutive models; accompanying <a href="http://arxiv.org/abs/1601.05970">[2]</a>), and finite strain (with hyper elastic and elasto-plastic constitutive models; accompanying <a href="http://arxiv.org/abs/1603.08893">[1]</a>). The examples only depend on standard <a href="https://www.python.org">Python</a> and its scientific libraries <a href="http://www.numpy.org">NumPy</a> and <a href="https://www.scipy.org">SciPy</a>, which are freely available for all operating systems and are widely used. No custom software or libraries are used, i.e. there are <strong>no hidden layers of complexity</strong>.</p>
 
 <p>Since different approaches exists for this type of numerical method, and since there are many styles and programming languages, <strong>anyone is invited to contribute</strong> by:</p>
 
@@ -50,19 +50,51 @@
 <li><p>Updating this document with the state-of-the-art: an overview of which literature and what approaches are 'on the market'.</p></li>
 </ol>
 
-<h1>
-<a id="available-examples" class="anchor" href="#available-examples" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Available examples</h1>
+<p>Both are very welcome, as this field is rapidly growing.</p>
 
-<ol>
-<li><p><code>finite-strain/hyper-elasticity.py</code> and <code>finite-strain/hyper-elasticity_even.py</code>: the main example of Ref.<a href="http://arxiv.org/abs/1603.08893">[1]</a> featuring a simple hyper-elastic model in finite strain. As described in Ref. <a href="http://arxiv.org/abs/1603.08893">[1]</a> the projection operator is slightly different for even or odd grids, here in included in two files. <em>Great to get started</em>.</p></li>
-<li><p><code>finite-strain/elasto-plasticity.py</code> and <code>finite-strain/elasto-plasticity_even.py</code>: an extension of example 1 with the Simo elasto-plastic model for finite strain <a href="http://arxiv.org/abs/1603.08893">[1]</a>. Furthermore, the definition of the projection operator is vectorized.</p></li>
-<li><p><code>finite-strain/elasto-plasticity_2D-micrograph</code>: a realistic example to simulate the mechanical response of the 2-D micrograph of dual-phase steel <a href="http://arxiv.org/abs/1603.08893">[1]</a>. Compared to example 2 this example deals with assuming 2-D plane strain.</p></li>
-</ol>
+<h1>
+<a id="examples" class="anchor" href="#examples" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Examples</h1>
+
+<p>The examples are divided in three categories:</p>
+
+<ul>
+<li><p><a href="#basic-methodology">Basic methodology</a>. These examples focus on accessibility while retaining some computational efficiency. <strong>Great to get started.</strong></p></li>
+<li><p><a href="#different-materials-models">Different materials models</a>. These examples focus on different constitutive relations (<em>which are completely uncoupled from the FFT-solver</em>). At the same time they are implemented more general and more efficiently than the examples that present the basic methodology.</p></li>
+<li><p><a href="#applications">Applications</a>. These examples show just how powerful the FFT-solver can be, even with the very simple Python code. Also, they introduce the concept of 2-D plane strain.</p></li>
+</ul>
+
+<h2>
+<a id="basic-methodology" class="anchor" href="#basic-methodology" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Basic methodology</h2>
+
+<ul>
+<li><p><a href="./finite-strain/hyper-elasticity.py"><code>finite-strain/hyper-elasticity.py</code></a> and <a href="./finite-strain/hyper-elasticity-even.py"><code>finite-strain/hyper-elasticity-even.py</code></a>: the main example of Ref. <a href="http://arxiv.org/abs/1603.08893">[1]</a> featuring a simple hyper-elastic model in finite strain. As described in Ref. <a href="http://arxiv.org/abs/1603.08893">[1]</a> the projection operator is slightly different for even or odd grids, here in included in two files.</p></li>
+<li><p><a href="./small-strain/linear-elasticity.py"><code>small-strain/linear-elasticity.py</code></a> and <a href="./small-strain/linear-elasticity-even.py"><code>small-strain/linear-elasticity-even.py</code></a>. The small strain equivalent (linear) of the previous example. Notice that the projection operator is more involved, as the symmetry of the strain tensor has to enforced.</p></li>
+</ul>
+
+<h2>
+<a id="different-materials-models" class="anchor" href="#different-materials-models" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Different materials models</h2>
+
+<ul>
+<li><p><a href="./finite-strain/elasto-plasticity.py"><code>finite-strain/elasto-plasticity.py</code></a> and <a href="./finite-strain/elasto-plasticity_even.py"><code>finite-strain/elasto-plasticity_even.py</code></a>: the Simo elasto-plastic constitutive model for finite strain <a href="http://arxiv.org/abs/1603.08893">[1]</a>. Furthermore, the definition of the projection operator is vectorized.</p></li>
+<li><p><a href="./small-strain/laminate/non-linear-elasticity.py"><code>small-strain/laminate/non-linear-elasticity.py</code></a>: a laminate of a non-linear elastic and a linear elastic material. For this configuration an analytical solution is available <a href="http://arxiv.org/abs/1601.05970">[2]</a>.</p></li>
+<li><p><a href="./small-strain/laminate/elasto-plasticity.py"><code>small-strain/laminate/elasto-plasticity.py</code></a>: a laminate of an elasto-plastic and a linear elastic material. For this configuration an analytical solution is available <a href="http://arxiv.org/abs/1601.05970">[2]</a>.</p></li>
+<li><p><a href="./small-strain/laminate/visco-plasticity.py"><code>small-strain/laminate/visco-plasticity.py</code></a>: a laminate of an elasto-visco-plastic and a linear elastic material. For this configuration an analytical solution is available <a href="http://arxiv.org/abs/1601.05970">[2]</a>.</p></li>
+</ul>
+
+<h2>
+<a id="applications" class="anchor" href="#applications" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Applications</h2>
+
+<ul>
+<li><p><a href="./finite-strain/elasto-plasticity_2D-micrograph"><code>finite-strain/elasto-plasticity_2D-micrograph</code></a>: a realistic example to simulate the mechanical response of the 2-D micrograph of dual-phase steel <a href="http://arxiv.org/abs/1603.08893">[1]</a>.</p></li>
+<li><p><a href="./small-strain/micrograph"><code>small-strain/micrograph</code></a>: the same example as the previous one, but in small strain <a href="http://arxiv.org/abs/1601.05970">[2]</a>.</p></li>
+</ul>
 
 <h1>
 <a id="references" class="anchor" href="#references" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>References</h1>
 
 <p>[1]: T.W.J. de Geus, J. Vondřejc, J. Zeman, R.H.J. Peerlings, M.G.D. Geers. Finite strain FFT-based non-linear solvers made simple. Submitted, 2016. <a href="http://arxiv.org/abs/1603.08893">arXiv: 1603.08893</a></p>
+
+<p>[2]: J. Zeman, T.W.J. de Geus, J. Vondřejc, R.H.J. Peerlings, M.G.D. Geers. A finite element perspective on non-linear FFT-based micromechanical simulations. International Journal for Numerical Methods in Engineering, Accepted, 2016. <a href="http://arxiv.org/abs/1601.05970">arXiv: 1601.05970</a></p>
         </section>
 
         <aside id="sidebar">
