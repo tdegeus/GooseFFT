@@ -88,38 +88,45 @@ II   = dyad22(I,I)
 # 2-D projection operator (only for non-zero frequency, associated with the mean)
 # - allocate / support function
 Ghat4_2 = np.zeros([2,2,2,2,Nx,Ny])                # projection operator
-x_2     = np.zeros([2      ,Nx,Ny],dtype='int32')  # position vectors
-q_2     = np.zeros([2      ,Nx,Ny],dtype='int32')  # frequency vectors
+x_2     = np.zeros([2      ,Nx,Ny],dtype='int64')  # position vectors
+q_2     = np.zeros([2      ,Nx,Ny],dtype='int64')  # frequency vectors
 delta   = lambda i,j: np.float(i==j)               # Dirac delta function
 # - set "x_2" as position vector of all grid-points
 x_2[0],x_2[1] = np.mgrid[:Nx,:Ny]
 # - convert positions "x_2" for frequencies "q_2"
 for i in range(2):
-    freq   = np.arange(-shape[i]/2,+shape[i]/2)
+    freq   = np.arange(-shape[i]/2,+shape[i]/2,dtype='int64')
     q_2[i] = freq[x_2[i]]
 # - compute "Q = ||q||",
 #   and "norm = 1/Q" being zero for Q==0 and Nyquist frequencies
-Q          = dot11(q_2,q_2)
-norm       = 1./Q
-norm[Q==0] = 0.
-norm[0,:]  = 0.
-norm[:,0]  = 0.
-# - set projection operator
+#   NB: avoid zero division
+q_2       = q_2.astype(np.float)
+Q         = dot11(q_2,q_2)
+Z         = Q==0
+Q[Z]      = 1.
+norm      = 1./Q
+norm[Z]   = 0.
+norm[0,:] = 0.
+norm[:,0] = 0.
+# - set projection operator                                   [grid of tensors]
 for i, j, l, m in itertools.product(range(2), repeat=4):
     Ghat4_2[i,j,l,m] = norm*delta(i,m)*q_2[j]*q_2[l]
 
-# 2-D (inverse) Fourier transform
+# 2-D (inverse) Fourier transform (for each tensor component in each direction)
 fft    = lambda x: np.fft.fftshift(np.fft.fftn (np.fft.ifftshift(x),[Nx,Ny]))
 ifft   = lambda x: np.fft.fftshift(np.fft.ifftn(np.fft.ifftshift(x),[Nx,Ny]))
 
-# 2-D projection 'G', and product 'G : K^LT : (delta F)^T'
+# functions for the 2-D projection 'G', and the product 'G : K^LT : (delta F)^T'
 G      = lambda A2_2 : np.real( ifft( ddot42(Ghat4_2,fft(A2_2)) ) ).reshape(-1)
 K_dF   = lambda dFm_2: trans2(ddot42(K4_2,trans2(dFm_2.reshape(2,2,Nx,Ny))))
 G_K_dF = lambda dFm_2: G(K_dF(dFm_2))
 
 # --------------------------- CONSTITUTIVE RESPONSE ---------------------------
 
-# return the constitutive response to a certain loading and history
+# constitutive response to a certain loading and history
+# NB: completely uncoupled from the FFT-solver, but implemented as a regular
+#     grid of quadrature points, to have an efficient code;
+#     each point is completely independent, just evaluated at the same time
 def constitutive(F,F_t,be_t,ep_t):
 
     # function to compute linearization of the logarithmic Finger tensor
@@ -168,7 +175,7 @@ def constitutive(F,F_t,be_t,ep_t):
 
     return P,P[:2,:2],K4[:2,:2,:2,:2],be,ep
 
-# function to convert materials parameters to grid of scalars
+# function to convert material parameters to grid of scalars
 param  = lambda soft,hard: soft*np.ones([Nx,Ny])*(1.-phase)+\
                            hard*np.ones([Nx,Ny])*    phase
 
@@ -220,7 +227,7 @@ for inc,lam in zip(range(1,ninc+1),stretch):
     # iterate as long as the iterative update does not vanish
     while True:
 
-        # solve linear system; update DOFs
+        # solve linear system using the Conjugate Gradient iterative solver
         dFm,i = sp.cg(tol=1.e-8,
           A       = sp.LinearOperator(shape=(2*2*Nx*Ny,2*2*Nx*Ny),matvec=G_K_dF,dtype='float'),
           b       = b,

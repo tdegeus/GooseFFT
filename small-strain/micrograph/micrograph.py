@@ -219,7 +219,7 @@ for inc in range(1,ninc+1):
         # update Newton iteration counter
         iiter += 1
 
-    # store history
+    # end-of-increment: update history
     ep_t   = np.array(ep  ,copy=True)
     epse_t = np.array(epse,copy=True)
     eps_t  = np.array(eps ,copy=True)

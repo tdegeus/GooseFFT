@@ -41,11 +41,11 @@ for i,j,l,m in itertools.product(range(ndim),repeat=4):
         if not q.dot(q) == 0:                      # zero freq. -> mean
             Ghat4[i,j,l,m,x,y,z] = delta(i,m)*q[j]*q[l]/(q.dot(q))
 
-# (inverse) Fourier transform
+# (inverse) Fourier transform (for each tensor component in each direction)
 fft    = lambda x  : np.fft.fftshift(np.fft.fftn (np.fft.ifftshift(x),[N,N,N]))
 ifft   = lambda x  : np.fft.fftshift(np.fft.ifftn(np.fft.ifftshift(x),[N,N,N]))
 
-# projection 'G', and product 'G : K^LT : (delta F)^T'
+# functions for the projection 'G', and the product 'G : K^LT : (delta F)^T'
 G      = lambda A2 : np.real( ifft( ddot42(Ghat4,fft(A2)) ) ).reshape(-1)
 K_dF   = lambda dFm: trans2(ddot42(K4,trans2(dFm.reshape(ndim,ndim,N,N,N))))
 G_K_dF = lambda dFm: G(K_dF(dFm))

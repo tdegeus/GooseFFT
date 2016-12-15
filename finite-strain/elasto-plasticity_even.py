@@ -11,7 +11,7 @@ np.seterr(divide='ignore', invalid='ignore')
 Nx     = 10          # number of voxels in x-direction
 Ny     = 12          # number of voxels in y-direction
 Nz     = 14          # number of voxels in z-direction
-shape  = [Nx,Ny,Nz]  # number of voxels in all directions
+shape  = [Nx,Ny,Nz]  # number of voxels as list: [Nx,Ny,Nz]
 
 # ----------------------------- TENSOR OPERATIONS -----------------------------
 
@@ -86,39 +86,45 @@ II   = dyad22(I,I)
 # NB: vectorized version of "hyper-elasticity_even.py"
 # - allocate / support function
 Ghat4  = np.zeros([3,3,3,3,Nx,Ny,Nz])                # projection operator
-x      = np.zeros([3      ,Nx,Ny,Nz],dtype='int32')  # position vectors
-q      = np.zeros([3      ,Nx,Ny,Nz],dtype='int32')  # frequency vectors
+x      = np.zeros([3      ,Nx,Ny,Nz],dtype='int64')  # position vectors
+q      = np.zeros([3      ,Nx,Ny,Nz],dtype='int64')  # frequency vectors
 delta  = lambda i,j: np.float(i==j)                  # Dirac delta function
-# - set "x" as position vector of all grid-points (grid)
+# - set "x" as position vector of all grid-points   [grid of vector-components]
 x[0],x[1],x[2] = np.mgrid[:Nx,:Ny,:Nz]
-# - convert positions "x" to frequencies "q" (grid)
+# - convert positions "x" to frequencies "q"        [grid of vector-components]
 for i in range(3):
-    freq = np.arange(-shape[i]/2,+shape[i]/2)
+    freq = np.arange(-shape[i]/2,+shape[i]/2,dtype='int64')
     q[i] = freq[x[i]]
 # - compute "Q = ||q||",
 #   and "norm = 1/Q" being zero for Q==0 and Nyquist frequencies
+q           = q.astype(np.float)
 Q           = dot11(q,q)
+Z           = Q==0
+Q[Z]        = 1.
 norm        = 1./Q
-norm[Q==0]  = 0.
+norm[Z]     = 0.
 norm[0,:,:] = 0.
 norm[:,0,:] = 0.
 norm[:,:,0] = 0.
-# - set projection operator (grid)
+# - set projection operator                                   [grid of tensors]
 for i, j, l, m in itertools.product(range(3), repeat=4):
     Ghat4[i,j,l,m] = norm*delta(i,m)*q[j]*q[l]
 
-# (inverse) Fourier transform
+# (inverse) Fourier transform (for each tensor component in each direction)
 fft  = lambda x: np.fft.fftshift(np.fft.fftn (np.fft.ifftshift(x),[Nx,Ny,Nz]))
 ifft = lambda x: np.fft.fftshift(np.fft.ifftn(np.fft.ifftshift(x),[Nx,Ny,Nz]))
 
-# projection 'G', and product 'G : K^LT : (delta F)^T'
+# functions for the projection 'G', and the product 'G : K^LT : (delta F)^T'
 G      = lambda A2 : np.real( ifft( ddot42(Ghat4,fft(A2)) ) ).reshape(-1)
 K_dF   = lambda dFm: trans2(ddot42(K4,trans2(dFm.reshape(3,3,Nx,Ny,Nz))))
 G_K_dF = lambda dFm: G(K_dF(dFm))
 
 # --------------------------- CONSTITUTIVE RESPONSE ---------------------------
 
-# return the constitutive response to a certain loading and history
+# constitutive response to a certain loading and history
+# NB: completely uncoupled from the FFT-solver, but implemented as a regular
+#     grid of quadrature points, to have an efficient code;
+#     each point is completely independent, just evaluated at the same time
 def constitutive(F,F_t,be_t,ep_t):
 
     # function to compute linearization of the logarithmic Finger tensor
@@ -169,7 +175,7 @@ def constitutive(F,F_t,be_t,ep_t):
 
 # phase indicator: square inclusion of volume fraction (3*3*14)/(10*12*14)
 phase  = np.zeros([Nx,Ny,Nz]); phase[:3,:3,:] = 1.
-# function to convert materials parameters to grid of scalars
+# function to convert material parameters to grid of scalars
 param  = lambda M0,M1: M0*np.ones([Nx,Ny,Nz])*(1.-phase)+\
                        M1*np.ones([Nx,Ny,Nz])*    phase
 # material parameters
@@ -215,7 +221,7 @@ for inc in range(1,ninc):
     # first iteration residual: distribute "barF" over grid using "K4"
     b     = -G_K_dF(barF-barF_t)
     F    +=         barF-barF_t
-    
+
     # parameters for Newton iterations: normalization and iteration counter
     Fn    = np.linalg.norm(F)
     iiter = 0
@@ -223,12 +229,14 @@ for inc in range(1,ninc):
     # iterate as long as the iterative update does not vanish
     while True:
 
-        # solve linear system; update DOFs
+        # solve linear system using the Conjugate Gradient iterative solver
         dFm,_ = sp.cg(tol=1.e-8,
           A   = sp.LinearOperator(shape=(F.size,F.size),matvec=G_K_dF,dtype='float'),
           b   = b,
         )
-        F    += dFm.reshape(3,3,Nx,Ny,Nz)
+
+        # add solution of linear system to DOFs
+        F += dFm.reshape(3,3,Nx,Ny,Nz)
 
         # compute residual stress and tangent, convert to residual
         P,K4,be,ep = constitutive(F,F_t,be_t,ep_t)
@@ -237,6 +245,8 @@ for inc in range(1,ninc):
         # check for convergence, print convergence info to screen
         print('{0:10.2e}'.format(np.linalg.norm(dFm)/Fn))
         if np.linalg.norm(dFm)/Fn<1.e-5 and iiter>0: break
+
+        # update Newton iteration counter
         iiter += 1
 
     # end-of-increment: update history
@@ -244,11 +254,3 @@ for inc in range(1,ninc):
     F_t    = np.array(F   ,copy=True)
     be_t   = np.array(be  ,copy=True)
     ep_t   = np.array(ep  ,copy=True)
-
-# ---------------------------- PLOT TYPICAL RESULT ----------------------------
-
-import matplotlib.pylab as plt
-
-plt.figure()
-plt.imshow(ep[:,:,1],interpolation='nearest',cmap='YlOrRd',clim=[0,0.4])
-plt.show()
