@@ -3,7 +3,7 @@
 - [Examples](#examples)
 - [References](#references)
 
-> This repository is distributed under an MIT license. In layman's term you are free to do what you want with it. We just kindly request you to cite our papers that form the basis for this repository, and encourage you to be equally open with your code.
+*This repository is distributed under an MIT license. In layman's term you are free to do what you want with it. We just kindly request you to cite our papers that form the basis for this repository, and encourage you to be equally open with your code.*
 
 # Introduction
 
