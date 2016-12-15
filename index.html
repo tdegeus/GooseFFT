@@ -13,7 +13,7 @@
     <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
 
-    <title>Goosefft by tdegeus</title>
+    <title>GooseFFT by tdegeus</title>
   </head>
 
   <body>
@@ -65,18 +65,18 @@
 <a id="basic-methodology" class="anchor" href="#basic-methodology" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Basic methodology</h2>
 
 <ul>
-<li><p><a href="./finite-strain/hyper-elasticity.py"><code>finite-strain/hyper-elasticity.py</code></a> and <a href="./finite-strain/hyper-elasticity-even.py"><code>finite-strain/hyper-elasticity-even.py</code></a>: the main example of Ref. <a href="http://arxiv.org/abs/1603.08893">[1]</a> featuring a simple hyper-elastic model in finite strain. As described in Ref. <a href="http://arxiv.org/abs/1603.08893">[1]</a> the projection operator is slightly different for even or odd grids, here in included in two files.</p></li>
-<li><p><a href="./small-strain/linear-elasticity.py"><code>small-strain/linear-elasticity.py</code></a> and <a href="./small-strain/linear-elasticity-even.py"><code>small-strain/linear-elasticity-even.py</code></a>. The small strain equivalent (linear) of the previous example. Notice that the projection operator is more involved, as the symmetry of the strain tensor has to enforced.</p></li>
+<li><p><a href="https://github.com/tdegeus/GooseFFT/blob/master/finite-strain/hyper-elasticity.py"><code>finite-strain/hyper-elasticity.py</code></a> and <a href="https://github.com/tdegeus/GooseFFT/blob/master/finite-strain/hyper-elasticity-even.py"><code>finite-strain/hyper-elasticity-even.py</code></a>: the main example of Ref. <a href="http://arxiv.org/abs/1603.08893">[1]</a> featuring a simple hyper-elastic model in finite strain. As described in Ref. <a href="http://arxiv.org/abs/1603.08893">[1]</a> the projection operator is slightly different for even or odd grids, here in included in two files.</p></li>
+<li><p><a href="https://github.com/tdegeus/GooseFFT/blob/master/small-strain/linear-elasticity.py"><code>small-strain/linear-elasticity.py</code></a> and <a href="https://github.com/tdegeus/GooseFFT/blob/master/small-strain/linear-elasticity-even.py"><code>small-strain/linear-elasticity-even.py</code></a>. The small strain equivalent (linear) of the previous example. Notice that the projection operator is more involved, as the symmetry of the strain tensor has to enforced.</p></li>
 </ul>
 
 <h2>
 <a id="different-materials-models" class="anchor" href="#different-materials-models" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Different materials models</h2>
 
 <ul>
-<li><p><a href="./finite-strain/elasto-plasticity.py"><code>finite-strain/elasto-plasticity.py</code></a> and <a href="./finite-strain/elasto-plasticity_even.py"><code>finite-strain/elasto-plasticity_even.py</code></a>: the Simo elasto-plastic constitutive model for finite strain <a href="http://arxiv.org/abs/1603.08893">[1]</a>. Furthermore, the definition of the projection operator is vectorized.</p></li>
-<li><p><a href="./small-strain/laminate/non-linear-elasticity.py"><code>small-strain/laminate/non-linear-elasticity.py</code></a>: a laminate of a non-linear elastic and a linear elastic material. For this configuration an analytical solution is available <a href="http://arxiv.org/abs/1601.05970">[2]</a>.</p></li>
-<li><p><a href="./small-strain/laminate/elasto-plasticity.py"><code>small-strain/laminate/elasto-plasticity.py</code></a>: a laminate of an elasto-plastic and a linear elastic material. For this configuration an analytical solution is available <a href="http://arxiv.org/abs/1601.05970">[2]</a>.</p></li>
-<li><p><a href="./small-strain/laminate/visco-plasticity.py"><code>small-strain/laminate/visco-plasticity.py</code></a>: a laminate of an elasto-visco-plastic and a linear elastic material. For this configuration an analytical solution is available <a href="http://arxiv.org/abs/1601.05970">[2]</a>.</p></li>
+<li><p><a href="https://github.com/tdegeus/GooseFFT/blob/master/finite-strain/elasto-plasticity.py"><code>finite-strain/elasto-plasticity.py</code></a> and <a href="https://github.com/tdegeus/GooseFFT/blob/master/finite-strain/elasto-plasticity_even.py"><code>finite-strain/elasto-plasticity_even.py</code></a>: the Simo elasto-plastic constitutive model for finite strain <a href="http://arxiv.org/abs/1603.08893">[1]</a>. Furthermore, the definition of the projection operator is vectorized.</p></li>
+<li><p><a href="https://github.com/tdegeus/GooseFFT/blob/master/small-strain/laminate/non-linear-elasticity.py"><code>small-strain/laminate/non-linear-elasticity.py</code></a>: a laminate of a non-linear elastic and a linear elastic material. For this configuration an analytical solution is available <a href="http://arxiv.org/abs/1601.05970">[2]</a>.</p></li>
+<li><p><a href="https://github.com/tdegeus/GooseFFT/blob/master/small-strain/laminate/elasto-plasticity.py"><code>small-strain/laminate/elasto-plasticity.py</code></a>: a laminate of an elasto-plastic and a linear elastic material. For this configuration an analytical solution is available <a href="http://arxiv.org/abs/1601.05970">[2]</a>.</p></li>
+<li><p><a href="https://github.com/tdegeus/GooseFFT/blob/master/small-strain/laminate/visco-plasticity.py"><code>small-strain/laminate/visco-plasticity.py</code></a>: a laminate of an elasto-visco-plastic and a linear elastic material. For this configuration an analytical solution is available <a href="http://arxiv.org/abs/1601.05970">[2]</a>.</p></li>
 </ul>
 
 <h2>
