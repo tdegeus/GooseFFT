@@ -1,0 +1,5 @@
+output*.npz
+*.out
+*.pbs
+*.txt
+*.svg

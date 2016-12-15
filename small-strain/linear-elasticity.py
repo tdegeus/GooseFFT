@@ -44,11 +44,11 @@ for i,j,l,m in itertools.product(range(ndim),repeat=4):
              (delta(j,l)*q[i]*q[m]+delta(j,m)*q[i]*q[l]+\
               delta(i,l)*q[j]*q[m]+delta(i,m)*q[j]*q[l])/(2.*q.dot(q))
 
-# (inverse) Fourier transform
+# (inverse) Fourier transform (for each tensor component in each direction)
 fft  = lambda x: np.fft.fftshift(np.fft.fftn (np.fft.ifftshift(x),[N,N,N]))
 ifft = lambda x: np.fft.fftshift(np.fft.ifftn(np.fft.ifftshift(x),[N,N,N]))
 
-# projection 'G', and product 'G : K : eps'
+# functions for the projection 'G', and the product 'G : K : eps'
 G        = lambda A2   : np.real( ifft( ddot42(Ghat4,fft(A2)) ) ).reshape(-1)
 K_deps   = lambda depsm: ddot42(K4,depsm.reshape(ndim,ndim,N,N,N))
 G_K_deps = lambda depsm: G(K_deps(depsm))
