@@ -1,0 +1,7 @@
+output*.npz
+*_plot.py
+*_output.py
+*.out
+*.pbs
+*.txt
+*.svg
