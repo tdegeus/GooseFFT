@@ -251,5 +251,5 @@ for inc,lam in zip(range(1,ninc+1),stretch):
     be_t   = np.array(be  ,copy=True)
     ep_t   = np.array(ep  ,copy=True)
 
-    np.savez('odd_ouput_inc%03d.npz'%inc,ep=ep)
+    np.savez('odd_output_inc%03d.npz'%inc,ep=ep)
 
