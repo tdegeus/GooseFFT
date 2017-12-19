@@ -130,7 +130,7 @@ def viscoplastic(eps,eps_t,epse_t,ep_t,dt):
     res        = -gamma0*dt*(sigeq_s/sig0)**(1./n)
 
     while np.linalg.norm(np.abs(res))/mu>1.e-6:
-        dres      = 1.+3.*mu*gamma0*dt/n*((sigeq_s-3.*mu*dgamma)/sig0)**(1./n-1.)
+        dres      = 1.+3.*mu*gamma0*dt/(n*sig0)*((sigeq_s-3.*mu*dgamma)/sig0)**(1./n-1.)
         dgamma   -= res/dres
         dgamma[Z] = 0.
         res       = dgamma-gamma0*dt*((sigeq_s-3.*mu*dgamma)/sig0)**(1./n);
