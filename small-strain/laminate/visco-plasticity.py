@@ -1,5 +1,5 @@
 import numpy as np
-import scipy.sparse.linalg as sp
+from petsc_solver import cg
 import itertools
 
 # turn of warning for zero division (occurs due to vectorization)
@@ -204,11 +204,8 @@ for inc in range(ninc):
     # iterate as long as the iterative update does not vanish
     while True:
 
-        # solve linear system
-        depsm,_ = sp.cg(tol=1.e-14,
-          A = sp.LinearOperator(shape=(ndof,ndof),matvec=G_K_deps,dtype='float'),
-          b = b,
-        )
+        # solve using petsc
+        depsm, _hist = cg(ndof, 1.e-14, b, G, G_K_deps)
 
         # add solution of linear system to DOFs
         eps += depsm.reshape(3,3,Nx,Ny,Nz)
