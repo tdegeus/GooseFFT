@@ -50,7 +50,7 @@ The examples are divided in three categories:
 
 *   [`small-strain/micrograph`](./small-strain/micrograph): the same example as the previous one, but in small strain [[2]](http://arxiv.org/abs/1601.05970).
 
-*   [`small-strain/micrograph`](./small-strain/spherical-inclusions): an example to simulate the response of a matrix material with spherical inclusions. The FFT operations of the simulation can be executed either using the CPU or GPU via CuPy.
+*   [`small-strain/spherical-inclusions`](./small-strain/spherical-inclusions): an example to simulate the response of a matrix material with spherical inclusions. The FFT operations of the simulation can be executed either using the CPU or GPU via CuPy.
 
 # References
 
