@@ -50,6 +50,8 @@ The examples are divided in three categories:
 
 *   [`small-strain/micrograph`](./small-strain/micrograph): the same example as the previous one, but in small strain [[2]](http://arxiv.org/abs/1601.05970).
 
+*   [`small-strain/micrograph`](./small-strain/spherical-inclusions): an example to simulate the response of a matrix material with spherical inclusions. The FFT operations of the simulation can be executed either using the CPU or GPU via CuPy.
+
 # References
 
 [1]: T.W.J. de Geus, J. Vondřejc, J. Zeman, R.H.J. Peerlings, M.G.D. Geers. Finite strain FFT-based non-linear solvers made simple. Computer Methods in Applied Mechanics and Engineering, 2017, 318:412–430. [doi: 10.1016/j.cma.2016.12.032](https://doi.org/10.1016/j.cma.2016.12.032), [arXiv: 1603.08893](http://arxiv.org/abs/1603.08893)
