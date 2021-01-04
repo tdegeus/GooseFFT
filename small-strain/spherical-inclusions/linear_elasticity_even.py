@@ -42,9 +42,6 @@ I4rt   = np.einsum('ijkl,xyz->ijklxyz',np.einsum('ik,jl',i,i),np.ones([N,N,N]))
 I4s    = (I4+I4rt)/2.
 II     = dyad22(I,I)
 
-# projection operator                                         [grid of tensors]
-# NB can be vectorized (faster, less readable), see: "elasto-plasticity_even.py"
-# - support function / look-up list / zero initialize
 # projection operator (only for non-zero frequency, associated with the mean)
 # NB: vectorized version of "hyper-elasticity_even.py"
 # - allocate / support function
