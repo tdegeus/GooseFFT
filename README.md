@@ -50,7 +50,7 @@ The examples are divided in three categories:
 
 *   [`small-strain/micrograph`](./small-strain/micrograph): the same example as the previous one, but in small strain [[2]](http://arxiv.org/abs/1601.05970).
 
-*   [`small-strain/spherical-inclusions`](./small-strain/spherical-inclusions): an example to simulate the response of a matrix material with spherical inclusions. The FFT operations of the simulation can be executed either using the CPU or GPU via CuPy.
+*   [`small-strain/spherical-inclusions`](./small-strain/spherical-inclusions): an example to simulate the response of a matrix material with spherical inclusions. The FFT operations of the simulation can be executed either using the CPU or GPU via CuPy [[3]](https://onlinelibrary.wiley.com/doi/10.1002/pamm.202000180).
 
 ### GPU support
 *   To enable GPU functionality for [`small-strain/spherical-inclusions`](./small-strain/spherical-inclusions) via the in-script flag `GPU = 1`, you need a CUDA enabled Nvidia GPU + CUDA installed. The easiest way for Linux / Ubuntu is to follow these instructions: https://www.tensorflow.org/install/gpu . After that, you can install CuPy via `pip install cupy-cuda110` .
@@ -60,3 +60,5 @@ The examples are divided in three categories:
 [1]: T.W.J. de Geus, J. Vondřejc, J. Zeman, R.H.J. Peerlings, M.G.D. Geers. Finite strain FFT-based non-linear solvers made simple. Computer Methods in Applied Mechanics and Engineering, 2017, 318:412–430. [doi: 10.1016/j.cma.2016.12.032](https://doi.org/10.1016/j.cma.2016.12.032), [arXiv: 1603.08893](http://arxiv.org/abs/1603.08893)
 
 [2]: J. Zeman, T.W.J. de Geus, J. Vondřejc, R.H.J. Peerlings, M.G.D. Geers. A finite element perspective on nonlinear FFT-based micromechanical simulations. International Journal for Numerical Methods in Engineering, 2017, 111(10):903–926. [doi: 10.1002/nme.5481](https://doi.org/10.1002/nme.5481), [arXiv: 1601.05970](http://arxiv.org/abs/1601.05970)
+
+[3]: A. Henkes, I. Caylak, R. Mahnken. "A deep learning driven uncertain full‐field homogenization method." PAMM 20.1 (2021): e202000180. [doi: 10.1002/pamm.202000180](https://doi.org/10.1002/pamm.202000180)
