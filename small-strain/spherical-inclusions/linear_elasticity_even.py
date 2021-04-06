@@ -18,7 +18,7 @@ def create_bin_sphere(matrix_size, center, radius):
 ndim   = 3            # number of dimensions
 N      = 32           # number of voxels (assumed equal for all directions)
 ndof   = ndim**2*N**3 # number of degrees-of-freedom
-shape  = [N,N,N]  # number of voxels as list: [Nx,Ny,Nz]
+shape  = [N,N,N]      # number of voxels as list: [Nx,Ny,Nz]
 
 # ---------------------- PROJECTION, TENSORS, OPERATIONS ----------------------
 
