@@ -70,9 +70,7 @@ norm[:,:,0] = 0.
 for i, j, l, m in itertools.product(range(3), repeat=4):
     Ghat4[i,j,l,m] = norm*delta(i,m)*q[j]*q[l]
 
-# Activate (1) GPU computation or not (0)
-GPU = 1
-if GPU == 1:
+if GPU:
     # (inverse) Fourier transform (for each tensor component in each direction)
     fft  = lambda x: cp.asnumpy(np.fft.fftshift(np.fft.fftn (np.fft.ifftshift(
         cp.asarray(x, x.dtype)),[N,N,N])))
