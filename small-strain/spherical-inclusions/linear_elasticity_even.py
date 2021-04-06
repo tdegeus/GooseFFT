@@ -92,7 +92,7 @@ G_K_deps = lambda depsm: G(K_deps(depsm))
 phase = np.zeros((N, N, N), dtype=np.int)
 real_cf = np.array([phase[phase == 1].size / phase.size])
 cf = 0.25
-no_of_spheres = 0
+nspheres = 0
 max_r = 0
 min_r = N
 print("\n\n+--------------------------------------------+")
