@@ -110,8 +110,6 @@ while (phase[phase == 1].size / phase.size) <= cf:
         phase[sphere == 1] = 1
         no_of_spheres += 1
         real_cf = np.array([phase[phase == 1].size / phase.size])
-        print("| %-20d  %20.3f |" % (no_of_spheres, float(real_cf)))
-print("+--------------------------------------------+\n")
 # material parameters + function to convert to grid of scalars
 param  = lambda M0,M1: M0*np.ones([N,N,N])*(1.-phase)+M1*np.ones([N,N,N])*phase
 K      = param(0.833,8.33)  # bulk  modulus                   [grid of scalars]
