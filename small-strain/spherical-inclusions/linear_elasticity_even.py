@@ -2,9 +2,9 @@ import numpy as np
 import scipy.sparse.linalg as sp
 import itertools
 
-# Activate (1) GPU computation or not (0)
-GPU = 1
-if GPU == 1:
+# True: use GPU computations. False: regular CPU computations
+GPU = True
+if GPU == False:
     import cupy as cp
 
 def create_bin_sphere(matrix_size, center, radius):
