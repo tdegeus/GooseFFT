@@ -88,7 +88,7 @@ G_K_deps = lambda depsm: G(K_deps(depsm))
 
 # ------------------- PROBLEM DEFINITION / CONSTITIVE MODEL -------------------
 
-# phase indicator: spherical inclusions of volume fraction cf
+# phase indicator: "nspheres" random spherical inclusions, with total volume fraction "cf"
 phase = np.zeros((N, N, N), dtype=np.int)
 real_cf = np.array([phase[phase == 1].size / phase.size])
 cf = 0.25
