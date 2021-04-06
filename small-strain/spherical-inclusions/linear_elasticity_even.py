@@ -95,10 +95,6 @@ cf = 0.25
 nspheres = 0
 max_r = 0
 min_r = N
-print("\n\n+--------------------------------------------+")
-print("| %-26s %15s |" % (
-    'Number of inclusions', 'Volume fraction'))
-print("+--------------------------------------------+")
 while (phase[phase == 1].size / phase.size) <= cf:
     r = np.random.uniform(low=1, high=10, size=None)
     if r > max_r:
