@@ -7,7 +7,9 @@ GPU = True
 if GPU == False:
     import cupy as cp
 
-def create_bin_sphere(matrix_size, center, radius):
+# function to create a sphere (defined by "center" and "radius") 
+# as ones in a grid (defined by "shape") of zeros
+def create_bin_sphere(shape, center, radius):
     coords = np.ogrid[:matrix_size[0], :matrix_size[1], :matrix_size[2]]
     distance = np.sqrt(
         (coords[0] - center[0]) ** 2 + (coords[1] - center[1]) ** 2 + (
